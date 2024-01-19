@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import DOMPurify from "isomorphic-dompurify";
 
 type Props = {
   searchParams: {
@@ -46,13 +47,16 @@ export async function generateMetadata({
 }
 
 export default function Page({ searchParams }: Props) {
-  let decodedContent = "";
+  let safeDecodedContent = "";
   try {
     const encodedContent = searchParams.content;
-    decodedContent = encodedContent ? decodeURIComponent(encodedContent) : "";
+    const decodedContent = encodedContent
+      ? decodeURIComponent(encodedContent)
+      : "";
+    safeDecodedContent = DOMPurify.sanitize(decodedContent);
   } catch (error) {
     console.log("Page ERROR:", error);
     return <p>Something went wrong</p>;
   }
-  return <main dangerouslySetInnerHTML={{ __html: decodedContent }}></main>;
+  return <main dangerouslySetInnerHTML={{ __html: safeDecodedContent }}></main>;
 }
