@@ -1,14 +1,9 @@
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 // import "./normalize.css";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "URL Encoded Tiny Website",
-  description: "URL Encoded Tiny Website",
-};
 
 export default function RootLayout({
   children,
