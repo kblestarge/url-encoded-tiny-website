@@ -3,9 +3,10 @@
 TODO:
 
 - Finish this readme
+- Figure out what the URL limit actually is (I've done beyond 7000 and it works)
 - Create a very clear example website, showing all the things it can do and the limitations.
 - Create a website creator page
-  - Little text editor
+  - Little text editor: https://tiptap.dev/docs/editor/examples/default
   - Or raw HTML editor
   - "x number of characters left" counter
   - Add metadata input forms (title, description, image)
@@ -15,7 +16,7 @@ TODO:
 
 ## What is this?
 
-This is the simplest, easiest, quickest, cheapest, way to create a website.
+This is the simplest, easiest, quickest, cheapest, way to create a static website.
 It's free and annonymous, no need to sign-up or log-in.
 But it must be tiny 😅.
 
