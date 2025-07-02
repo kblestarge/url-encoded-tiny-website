@@ -41,6 +41,9 @@ TODO: like to the example.md
 - Website limited to 2048 characters (actually fewer considering the baseUrl, query param keys, etc. It's probably more like 2000.)
 - Must use in-line CSS for styling.
 - No way to edit your website and keep the same existing URL (because the URL is the website).
+- For security reasons, script tags (executable JavaScript) is not allowed.
+- No file hosting is supported. If you want to use an image, then host it somewhere else on the web and use its web address in the src attribute.
+-
 
 ## Getting Started
 

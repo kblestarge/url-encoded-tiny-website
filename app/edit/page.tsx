@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
-import { generateMetadata as dynamicGenerateMetadata } from './generateMetadata';
+import { generateMetadata as dynamicGenerateMetadata } from '../generateMetadata';
 
-const ViewerPage = dynamic(() => import('./ViewerPage'), { ssr: false });
+const EditorPage = dynamic(() => import('../EditorPage'), { ssr: false });
 
 export const generateMetadata = async ({
   searchParams,
@@ -11,7 +11,7 @@ export const generateMetadata = async ({
   // Map searchParams to queryParams for generateMetadata.ts
   return dynamicGenerateMetadata({
     queryParams: {
-      title: searchParams.title || '',
+      title: searchParams.title ? `Edit: ${searchParams.title}` : '',
       description: searchParams.description || '',
       mainImage: searchParams.mainImage || '',
     },
@@ -19,5 +19,5 @@ export const generateMetadata = async ({
 };
 
 export default function Page() {
-  return <ViewerPage />;
+  return <EditorPage />;
 }
