@@ -57,6 +57,22 @@ export default function ViewerPage() {
     return <p>Something went wrong</p>;
   }
 
+  function handleEditClick() {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('editorContent', content);
+      // Also store meta fields if present in URL query params
+      const params = new URLSearchParams(window.location.search);
+      const metaFields = ['title', 'description', 'mainImage'];
+      metaFields.forEach((field) => {
+        const value = params.get(field);
+        if (value) {
+          sessionStorage.setItem(`editorMeta_${field}`, value);
+        }
+      });
+      window.location.href = '/edit';
+    }
+  }
+
   return (
     <>
       <main dangerouslySetInnerHTML={{ __html: safeDecodedContent }}></main>
@@ -68,31 +84,23 @@ export default function ViewerPage() {
           margin: '50px 0',
         }}
       >
-        <Link
-          href={
-            typeof window !== 'undefined'
-              ? `${'/edit' + window.location.search + window.location.hash}`
-              : '/edit'
-          }
-          legacyBehavior
+        <button
+          onClick={handleEditClick}
+          style={{
+            pointerEvents: 'auto',
+            background: '#222',
+            color: '#fff',
+            padding: '12px 32px',
+            borderRadius: 24,
+            fontWeight: 600,
+            fontSize: 18,
+            textDecoration: 'none',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            transition: 'background 0.2s',
+          }}
         >
-          <a
-            style={{
-              pointerEvents: 'auto',
-              background: '#222',
-              color: '#fff',
-              padding: '12px 32px',
-              borderRadius: 24,
-              fontWeight: 600,
-              fontSize: 18,
-              textDecoration: 'none',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-              transition: 'background 0.2s',
-            }}
-          >
-            Edit this website
-          </a>
-        </Link>
+          Edit this website
+        </button>
       </div>
     </>
   );

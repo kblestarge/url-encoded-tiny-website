@@ -1,10 +1,18 @@
 'use client';
 
 import DOMPurify from 'isomorphic-dompurify';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import 'quill/dist/quill.snow.css';
 import QuillNoSSRWrapper from './QuillEditor';
+import Link from 'next/link';
+
+/**
+ * TODO:
+ * - Remove url params (search and hash params) from the edit page. Use internal state instead.
+ *    - Or at least make it optional. It should still be an option, but navigating to edit from viewer page button click should use internal state.
+ * - Add a "save" button on this edit page that redirects you to the viewer page with the updates.
+ * - Add wysiwyg editor mode as url param (e.g. ?mode=wysiwyg) so you can switch between HTML and WYSIWYG modes.
+ */
 
 const ALLOWED_IFRAME_DOMAINS = ['www.youtube.com', 'player.vimeo.com'];
 
@@ -73,41 +81,43 @@ function getContentFromHash() {
   return match ? decodeURIComponent(match[1]) : '';
 }
 
+// Helper to parse query params from URL
+function getQueryParam(name: string) {
+  if (typeof window === 'undefined') return '';
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name) || '';
+}
+
+// Helper to get initial meta field value (sessionStorage > query param)
+function getInitialMetaField(field: string) {
+  if (typeof window === 'undefined') return '';
+  const sessionValue = sessionStorage.getItem(`editorMeta_${field}`);
+  if (sessionValue) {
+    sessionStorage.removeItem(`editorMeta_${field}`);
+    return sessionValue;
+  }
+  return getQueryParam(field);
+}
+
 export default function EditorPage() {
+  // Try to get content from sessionStorage first, then fallback to hash
+  function getInitialContent() {
+    if (typeof window === 'undefined') return '';
+    const sessionContent = sessionStorage.getItem('editorContent');
+    if (sessionContent) {
+      sessionStorage.removeItem('editorContent'); // Clear after use
+      return sessionContent;
+    }
+    return getContentFromHash();
+  }
+
   const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.HTML);
-  const [editorContent, setEditorContent] = useState(
-    getContentFromHash() || ''
+  const [editorContent, setEditorContent] = useState(getInitialContent());
+  const [title, setTitle] = useState(getInitialMetaField('title'));
+  const [description, setDescription] = useState(
+    getInitialMetaField('description')
   );
-
-  // Sync state with hash on mount and hashchange
-  useEffect(() => {
-    function syncContent() {
-      const hashContent = getContentFromHash();
-      console.log('Syncing content from hash:', hashContent);
-      // Only update if content actually changed to avoid cursor jump
-      setEditorContent((prev) => (prev !== hashContent ? hashContent : prev));
-    }
-    window.addEventListener('hashchange', syncContent);
-    return () => window.removeEventListener('hashchange', syncContent);
-  }, []);
-
-  // Update hash when editorContent changes, but skip on first render
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // Only update hash if content actually changed to avoid infinite loop
-    const hashContent = getContentFromHash();
-    console.log('Editor content changed, current hashContent:', hashContent);
-    console.log(
-      'Editor content changed, current editorContent:',
-      editorContent
-    );
-    if (editorContent !== hashContent) {
-      const encoded = encodeURIComponent(editorContent);
-      const newHash = encoded ? `content=${encoded}` : '';
-      console.log('Updating hash:', newHash);
-      window.location.hash = newHash ? `#${newHash}` : '';
-    }
-  }, [editorContent]);
+  const [mainImage, setMainImage] = useState(getInitialMetaField('mainImage'));
 
   let safeDecodedContent = '';
   try {
@@ -128,6 +138,105 @@ export default function EditorPage() {
 
   return (
     <>
+      {/* Meta fields */}
+      <div
+        style={{
+          marginBottom: 24,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
+        <div
+          style={{
+            flex: '1 1 300px',
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <label style={{ marginBottom: 8, fontWeight: 500 }}>
+            Title:
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={{
+                width: '100%',
+                marginTop: 4,
+                marginBottom: 0,
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #ccc',
+                fontSize: 18,
+              }}
+              placeholder="Enter title"
+            />
+          </label>
+        </div>
+        <div
+          style={{
+            flex: '1 1 300px',
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <label style={{ marginBottom: 8, fontWeight: 500 }}>
+            Main Image URL:
+            <input
+              type="text"
+              value={mainImage}
+              onChange={(e) => setMainImage(e.target.value)}
+              style={{
+                width: '100%',
+                marginTop: 4,
+                marginBottom: 0,
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #ccc',
+                fontSize: 18,
+              }}
+              placeholder="Enter main image URL"
+            />
+          </label>
+          {mainImage && (
+            <img
+              src={mainImage}
+              alt="Main preview"
+              style={{
+                marginTop: 8,
+                maxWidth: '100%',
+                maxHeight: 120,
+                borderRadius: 8,
+                objectFit: 'cover',
+                border: '1px solid #eee',
+                background: '#fafafa',
+              }}
+            />
+          )}
+        </div>
+      </div>
+      <div style={{ marginBottom: 24 }}>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+          Description:
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={{
+              width: '100%',
+              marginTop: 4,
+              marginBottom: 12,
+              minHeight: 60,
+              padding: 8,
+              borderRadius: 6,
+              border: '1px solid #ccc',
+              fontSize: 16,
+            }}
+            placeholder="Enter description"
+          />
+        </label>
+      </div>
       <div className="editor-controls" style={{ marginBottom: 16 }}>
         <button
           onClick={() => setEditorMode(EditorMode.WYSIWYG)}
@@ -163,6 +272,27 @@ export default function EditorPage() {
           />
         )}
       </div>
+      <Link
+        href={{
+          pathname: '/',
+          hash: `content=${encodeURIComponent(editorContent)}`,
+          query: {
+            title,
+            description,
+            mainImage,
+          },
+        }}
+        style={{
+          display: 'inline-block',
+          background: '#222',
+          color: '#fff',
+          padding: '12px 32px',
+          borderRadius: 24,
+          textDecoration: 'none',
+        }}
+      >
+        View
+      </Link>
       {/* {editorMode === EditorMode.HTML && (
         <main dangerouslySetInnerHTML={{ __html: safeDecodedContent }}></main>
       )} */}
