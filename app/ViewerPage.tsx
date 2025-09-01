@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
 import { useEffect, useState } from 'react';
 
@@ -75,7 +74,13 @@ export default function ViewerPage() {
 
   return (
     <>
-      <main dangerouslySetInnerHTML={{ __html: safeDecodedContent }}></main>
+      {/* Wrap with Quill classes so ql-* styles can take effect */}
+      <main className="ql-container ql-snow">
+        <div
+          className="ql-editor"
+          dangerouslySetInnerHTML={{ __html: safeDecodedContent }}
+        />
+      </main>
       <div
         style={{
           display: 'flex',

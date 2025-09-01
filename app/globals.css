@@ -25,3 +25,40 @@ body {
     )
     rgb(var(--background-start-rgb));
 } */
+
+/* Ensure ReactQuill respects min-height on the editable area */
+.ql-min-h .ql-editor {
+  min-height: var(--ql-min-h, 158px);
+}
+
+/* Quill list visibility fixes: ensure bullets/numbers render even if a reset removes them */
+.ql-container .ql-editor ol,
+.ql-container .ql-editor ul {
+  padding-left: 1.5em;
+}
+
+.ql-container .ql-editor ul > li {
+  list-style: disc;
+}
+
+.ql-container .ql-editor ol > li {
+  list-style: decimal;
+}
+
+/* Nested unordered list markers */
+.ql-container .ql-editor ul ul > li {
+  list-style: circle;
+}
+.ql-container .ql-editor ul ul ul > li {
+  list-style: square;
+}
+
+/* Prefer native markers over Quill's pseudo markers to avoid duplicates */
+.ql-container .ql-editor li::before {
+  content: normal !important;
+}
+
+/* OVERRIDES */
+main.ql-container.ql-snow {
+  border: none;
+}
