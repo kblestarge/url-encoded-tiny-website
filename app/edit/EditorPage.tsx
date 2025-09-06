@@ -111,6 +111,9 @@ export default function EditorPage() {
     getInitialMetaField('description')
   );
   const [mainImage, setMainImage] = useState(getInitialMetaField('mainImage'));
+  const [hideEditButton, setHideEditButton] = useState(
+    getInitialMetaField('hideEditButton') === 'true'
+  );
 
   // Accordion measurement for smooth open/close animation
   const metaContentRef = useRef<HTMLDivElement>(null);
@@ -133,7 +136,7 @@ export default function EditorPage() {
     if (metaContentRef.current) {
       setMetaMaxHeight(metaContentRef.current.scrollHeight);
     }
-  }, [showMetaFields, title, description, mainImage]);
+  }, [showMetaFields, title, description, mainImage, hideEditButton]);
 
   let safeDecodedContent = '';
   try {
@@ -149,12 +152,10 @@ export default function EditorPage() {
    * - at least make the editor allow for tabbing.
    *
    * - Fix the WYSIWYG editor to allow for style properties on HTML elements
-   * - Add more toolbar options to WYSIWYG editor (e.g. font size, font family, text color, background color)
    * - Add image and video support to WYSIWYG editor (should only allow URLs from the web, not data: or blob: or local files)
    * - Add a character count and word count
    * -
-   * - Add tooltip popups to explain more
-   * - Add option to hide "edit" button from website
+   * - Make homepage suuuuper details and great :)
    */
 
   return (
@@ -173,7 +174,7 @@ export default function EditorPage() {
             margin: 0,
           }}
         >
-          Meta Fields
+          Page Settings
         </h2>
         <button
           onClick={() => setShowMetaFields((v) => !v)}
@@ -189,7 +190,7 @@ export default function EditorPage() {
             padding: '6px 8px',
             cursor: 'pointer',
           }}
-          title={showMetaFields ? 'Hide meta fields' : 'Show meta fields'}
+          title={showMetaFields ? 'Hide page settings' : 'Show page settings'}
         >
           <span style={{ fontSize: 14, fontWeight: 500 }}>
             {showMetaFields ? 'Hide' : 'Show'}
@@ -225,6 +226,27 @@ export default function EditorPage() {
         aria-hidden={!showMetaFields}
       >
         <div ref={metaContentRef}>
+          <div style={{ margin: '5px 0 20px' }}>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontWeight: 500,
+                cursor: 'pointer',
+                userSelect: 'none',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={hideEditButton}
+                onChange={(e) => setHideEditButton(e.target.checked)}
+                style={{ width: 16, height: 16, cursor: 'pointer' }}
+              />
+              Hide edit button
+              <InfoIcon tooltip="If checked, the 'Edit this website' button will be hidden on the viewer page." />
+            </label>
+          </div>
           <div
             style={{
               marginBottom: 24,
@@ -242,13 +264,22 @@ export default function EditorPage() {
               }}
             >
               <label style={{ marginBottom: 8, fontWeight: 500 }}>
-                Title:
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  Title
+                  <InfoIcon tooltip="If set, this becomes the <title> tag for the page." />
+                </span>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   style={{
-                    width: 'calc(100% - 16px)',
+                    width: 'calc(100% - 18px)',
                     marginTop: 4,
                     marginBottom: 0,
                     padding: 8,
@@ -269,13 +300,22 @@ export default function EditorPage() {
               }}
             >
               <label style={{ marginBottom: 8, fontWeight: 500 }}>
-                Main Image URL:
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  Main Image URL
+                  <InfoIcon tooltip="If set, this becomes the <meta property='og:image'> tag for link previews." />
+                </span>
                 <input
                   type="text"
                   value={mainImage}
                   onChange={(e) => setMainImage(e.target.value)}
                   style={{
-                    width: 'calc(100% - 16px)',
+                    width: 'calc(100% - 18px)',
                     marginTop: 4,
                     marginBottom: 0,
                     padding: 8,
@@ -292,12 +332,21 @@ export default function EditorPage() {
             <label
               style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}
             >
-              Description:
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                Description
+                <InfoIcon tooltip="If set, this becomes the <meta name='description'> tag." />
+              </span>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 style={{
-                  width: 'calc(100% - 16px)',
+                  width: 'calc(100% - 18px)',
                   marginTop: 4,
                   marginBottom: 12,
                   minHeight: 60,
@@ -376,12 +425,13 @@ export default function EditorPage() {
       </div>
       <Link
         href={{
-          pathname: '/',
+          pathname: '/view',
           hash: `content=${encodeURIComponent(editorContent)}`,
           query: {
             title,
             description,
             mainImage,
+            hideEditButton: hideEditButton ? 'true' : undefined,
           },
         }}
         style={{
@@ -395,9 +445,33 @@ export default function EditorPage() {
       >
         View
       </Link>
-      {/* {editorMode === EditorMode.HTML && (
-        <main dangerouslySetInnerHTML={{ __html: safeDecodedContent }}></main>
-      )} */}
     </>
+  );
+}
+
+// Reusable info icon button to reduce duplication for meta field tooltips
+function InfoIcon({ tooltip }: { tooltip: string }) {
+  return (
+    <button
+      type="button"
+      aria-label={tooltip}
+      title={tooltip}
+      style={{
+        background: '#eef2f5',
+        border: '1px solid #ccd2d8',
+        padding: 0,
+        width: 18,
+        height: 18,
+        borderRadius: '50%',
+        cursor: 'help',
+        fontSize: 12,
+        lineHeight: '18px',
+        textAlign: 'center',
+        color: '#8e8e8e',
+        fontWeight: 600,
+      }}
+    >
+      i
+    </button>
   );
 }

@@ -1,23 +1,6 @@
-import dynamic from 'next/dynamic';
-import { generateMetadata as dynamicGenerateMetadata } from './generateMetadata';
-
-const ViewerPage = dynamic(() => import('./ViewerPage'), { ssr: false });
-
-export const generateMetadata = async ({
-  searchParams,
-}: {
-  searchParams: { title?: string; description?: string; mainImage?: string };
-}) => {
-  // Map searchParams to queryParams for generateMetadata.ts
-  return dynamicGenerateMetadata({
-    queryParams: {
-      title: searchParams.title || '',
-      description: searchParams.description || '',
-      mainImage: searchParams.mainImage || '',
-    },
-  });
-};
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return <ViewerPage />;
+  const homepage = `/view?title=URL%20Encoded%20Tiny%20Website&description=This%20website%20is%20created%20dynamically%20based%20on%20the%20contents%20of%20the%20URL&mainImage=https://i.kym-cdn.com/photos/images/newsfeed/000/170/791/welcome-to-the-internet-internet-demotivational-poster-1264714433.png.jpg/#content=%3Ch1%3EThis%20webpage%20is%20stored%20in%20the%20URL%20%F0%9F%A4%93%3C%2Fh1%3E%3Ch2%3EHow%20does%20this%20website%20work%3F%3C%2Fh2%3E%3Cp%3EI%27m%20using%20the%20URL%20as%20a%20content%20management%20system%20%28CMS%29.%20All%20rendered%20content%20on%20the%20page%20will%20come%20from%20the%20URL%27s%20query%20params.%20Here%20are%20the%20available%20query%20params%3A%3C%2Fp%3E%3Cul%3E%3Cli%3E%60content%60.%20This%20is%20the%20content%20of%20the%20page.%20You%20can%20put%20raw%20text%20in%20here%20or%20HTML.%3C%2Fli%3E%3Cli%3E%60title%60.%20This%20is%20the%20website%20title%20that%20appears%20above%20the%20tab%20in%20the%20browser.%3C%2Fli%3E%3Cli%3E%60description%60.%20This%20is%20the%20website%20description%20that%20will%20appear%20in%20the%20%3Chead%3E%20metadata.%3C%2Fli%3E%3Cli%3E%60mainImage%60.%20This%20is%20the%20website%27s%20OG%20image%20that%20will%20appear%20in%20the%20metadata.%3C%2Fli%3E%3C%2Ful%3E%3Cp%3EThe%20website%20is%20server-side%20rendered%20using%20next.js%2C%20so%20the%20link%20you%20create%20for%20your%20website%20will%20support%20a%20link%2FURL%20preview.%3C%2Fp%3E%3Ch2%3ELimitations%3C%2Fh2%3E%3Col%3E%3Cli%3ELong%2C%20ridiculous%20URL%3C%2Fli%3E%3Cli%3ELimited%20to%202048%20characters%20%28actually%20fewer%20considering%20the%20baseUrl%2C%20query%20param%20keys%2C%20etc.%20It%27s%20probably%20more%20like%202000.%29%3C%2Fli%3E%3Cli%3EMust%20use%20in-line%20CSS%20for%20styling.%3C%2Fli%3E%3Cli%3ENo%20way%20to%20edit%20your%20webpage%20and%20keep%20the%20same%20URL%20%28because%20the%20URL%20is%20the%20website%29.%3C%2Fli%3E%3C%2Fol%3E%3Ch2%3EContent%20Examples%3C%2Fh2%3E%3Ch3%3EImage%20by%20src%3C%2Fh3%3E%3Cimg%20src%3D%22https%3A%2F%2Fi.kym-cdn.com%2Fphotos%2Fimages%2Fnewsfeed%2F000%2F170%2F791%2Fwelcome-to-the-internet-internet-demotivational-poster-1264714433.png.jpg%22%20%2F%3E%3Ch3%3EEmbedded%20video%3C%2Fh3%3E%3Ciframe%20width%3D%22560%22%20height%3D%22315%22%20src%3D%22https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ%3Fsi%3DK9DcZqmcWV4gjGG5%22%20title%3D%22YouTube%20video%20player%22%20frameborder%3D%220%22%20allow%3D%22accelerometer%3B%20autoplay%3B%20clipboard-write%3B%20encrypted-media%3B%20gyroscope%3B%20picture-in-picture%3B%20web-share%22%20allowfullscreen%3E%3C%2Fiframe%3E%3Ch3%3ECool%20styling%3C%2Fh3%3E%3Cdiv%20style%3D%22border-radius%3A90px%3B%20width%3A150px%3B%20height%3A%20150px%3B%20background%3Agreen%3B%20display%3Aflex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%3Cp%3E%3Cb%3EHello%3C%2Fb%3E%20%3Ci%3EWorld%3C%2Fi%3E%20%F0%9F%98%8E%3C%2Fp%3E%3C%2Fdiv%3E`;
+  redirect(homepage);
 }

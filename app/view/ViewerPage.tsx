@@ -31,6 +31,7 @@ const SANITIZE_CONFIG = {
 export default function ViewerPage() {
   // Get content from hash (client-side only)
   const [content, setContent] = useState('');
+  const [hideEditButton, setHideEditButton] = useState(false);
 
   function getContentFromHash() {
     if (typeof window === 'undefined') return '';
@@ -42,6 +43,10 @@ export default function ViewerPage() {
   useEffect(() => {
     function syncContent() {
       setContent(getContentFromHash());
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        setHideEditButton(params.get('hideEditButton') === 'true');
+      }
     }
     syncContent();
     window.addEventListener('hashchange', syncContent);
@@ -61,7 +66,12 @@ export default function ViewerPage() {
       sessionStorage.setItem('editorContent', content);
       // Also store meta fields if present in URL query params
       const params = new URLSearchParams(window.location.search);
-      const metaFields = ['title', 'description', 'mainImage'];
+      const metaFields = [
+        'title',
+        'description',
+        'mainImage',
+        'hideEditButton',
+      ];
       metaFields.forEach((field) => {
         const value = params.get(field);
         if (value) {
@@ -81,32 +91,34 @@ export default function ViewerPage() {
           dangerouslySetInnerHTML={{ __html: safeDecodedContent }}
         />
       </main>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-          margin: '50px 0',
-        }}
-      >
-        <button
-          onClick={handleEditClick}
+      {!hideEditButton && (
+        <div
           style={{
-            pointerEvents: 'auto',
-            background: '#222',
-            color: '#fff',
-            padding: '12px 32px',
-            borderRadius: 24,
-            fontWeight: 600,
-            fontSize: 18,
-            textDecoration: 'none',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            transition: 'background 0.2s',
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            margin: '50px 0',
           }}
         >
-          Edit this website
-        </button>
-      </div>
+          <button
+            onClick={handleEditClick}
+            style={{
+              pointerEvents: 'auto',
+              background: '#222',
+              color: '#fff',
+              padding: '12px 32px',
+              borderRadius: 24,
+              fontWeight: 600,
+              fontSize: 18,
+              textDecoration: 'none',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              transition: 'background 0.2s',
+            }}
+          >
+            Edit this website
+          </button>
+        </div>
+      )}
     </>
   );
 }
